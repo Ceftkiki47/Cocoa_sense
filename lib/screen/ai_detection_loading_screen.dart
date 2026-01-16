@@ -15,42 +15,27 @@ class _AIDetectionLoadingScreenState extends State<AIDetectionLoadingScreen>
     with TickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
-  
-  late AnimationController _rotationController;
-  late AnimationController _particleController;
-  late AnimationController _waveController;
+  late AnimationController _rotateController;
 
   @override
   void initState() {
     super.initState();
 
     _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
     _pulseAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
-    // Rotation animation for background circles
-    _rotationController = AnimationController(
-      duration: const Duration(seconds: 20),
+    _rotateController = AnimationController(
+      duration: const Duration(seconds: 8),
       vsync: this,
-    )..repeat();
-
-    // Particle animation
-    _particleController = AnimationController(
-      duration: const Duration(seconds: 3),
-      vsync: this,
-    )..repeat();
-
-    // Wave animation
-    _waveController = AnimationController(
-      duration: const Duration(seconds: 4),
-      vsync: this,
-    )..repeat();
+    );
 
     _pulseController.repeat(reverse: true);
+    _rotateController.repeat();
     _startDetection();
   }
 
@@ -61,386 +46,258 @@ class _AIDetectionLoadingScreenState extends State<AIDetectionLoadingScreen>
       final geminiService = GeminiAIService();
       final result = await geminiService.detectCocoa(imagePath);
 
-      Get.offNamed('/ai-result', arguments: {
-        'imagePath': imagePath,
-        'result': result,
-      });
+      if (mounted) {
+        Get.offNamed('/ai-result', arguments: {
+          'imagePath': imagePath,
+          'result': result,
+        });
+      }
     } catch (e) {
-      Get.back();
-      Get.snackbar(
-        'Error',
-        'Gagal menganalisis: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      if (mounted) {
+        Get.back();
+        Get.snackbar(
+          'Error',
+          'Gagal menganalisis: $e',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+        );
+      }
     }
   }
 
   @override
   void dispose() {
     _pulseController.dispose();
-    _rotationController.dispose();
-    _particleController.dispose();
-    _waveController.dispose();
+    _rotateController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // Animated Gradient Background
-          AnimatedBuilder(
-            animation: _waveController,
-            builder: (context, child) {
-              return Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color.lerp(
-                        const Color(0xFF1a5c3a),
-                        const Color(0xFF2D7A4F),
-                        (_waveController.value * 2) % 1,
-                      )!,
-                      const Color(0xFF2D7A4F),
-                      Color.lerp(
-                        const Color(0xFF3D9A63),
-                        const Color(0xFF4DB370),
-                        (_waveController.value * 2) % 1,
-                      )!,
-                    ],
-                  ),
-                ),
-              );
-            },
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFF1F5A37),
+              const Color(0xFF2D7A4F),
+              const Color(0xFF3D9A63),
+            ],
           ),
-
-          // Animated Circles Background
-          AnimatedBuilder(
-            animation: _rotationController,
-            builder: (context, child) {
-              return CustomPaint(
-                painter: CircleBackgroundPainter(
-                  animation: _rotationController.value,
-                ),
-                child: Container(),
-              );
-            },
-          ),
-
-          // Floating Particles
-          AnimatedBuilder(
-            animation: _particleController,
-            builder: (context, child) {
-              return CustomPaint(
-                painter: ParticlePainter(
-                  animation: _particleController.value,
-                ),
-                child: Container(),
-              );
-            },
-          ),
-
-          // Grid Pattern Overlay
-          Opacity(
-            opacity: 0.03,
-            child: CustomPaint(
-              painter: GridPainter(),
-              child: Container(),
-            ),
-          ),
-
-          // Main Content
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Main Card
-                      Container(
-                        margin: const EdgeInsets.all(16),
-                        padding: const EdgeInsets.all(32),
+        ),
+        child: Stack(
+          children: [
+            // Animated circles background (optimized)
+            ...List.generate(3, (index) {
+              return Positioned(
+                top: -100 + (index * 150.0),
+                right: -100 + (index * 80.0),
+                child: AnimatedBuilder(
+                  animation: _rotateController,
+                  builder: (context, child) {
+                    return Transform.rotate(
+                      angle: _rotateController.value * 2 * math.pi * (index % 2 == 0 ? 1 : -1),
+                      child: Container(
+                        width: 200 + (index * 50.0),
+                        height: 200 + (index * 50.0),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 30,
-                              offset: const Offset(0, 10),
-                            ),
-                            BoxShadow(
-                              color: const Color(0xFF2D7A4F).withOpacity(0.3),
-                              blurRadius: 20,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // AI Icon with Lottie Animation
-                            AnimatedBuilder(
-                              animation: _pulseAnimation,
-                              builder: (context, child) {
-                                return Transform.scale(
-                                  scale: _pulseAnimation.value,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: RadialGradient(
-                                        colors: [
-                                          const Color(0xFF2D7A4F).withOpacity(0.1),
-                                          Colors.transparent,
-                                        ],
-                                      ),
-                                    ),
-                                    child: Lottie.asset(
-                                      'assets/animations/AI.json',
-                                      height: 180,
-                                      width: 180,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-
-                            const SizedBox(height: 24),
-
-                            const Text(
-                              'Gemini AI Menganalisis',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF2D7A4F),
-                              ),
-                            ),
-
-                            const SizedBox(height: 8),
-
-                            Text(
-                              'Mohon tunggu sebentar...',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade600,
-                                fontStyle: FontStyle.italic,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-
-                            const SizedBox(height: 24),
-
-                            // Animated Loading Bar
-                            SizedBox(
-                              width: 200,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: LinearProgressIndicator(
-                                  backgroundColor: Colors.grey.shade200,
-                                  valueColor: const AlwaysStoppedAnimation<Color>(
-                                    Color(0xFF2D7A4F),
-                                  ),
-                                  minHeight: 8,
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 20),
-
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    const Color(0xFF2D7A4F).withOpacity(0.1),
-                                    const Color(0xFF3D9A63).withOpacity(0.1),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: const Color(0xFF2D7A4F).withOpacity(0.3),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.auto_awesome,
-                                    size: 18,
-                                    color: Color(0xFF2D7A4F),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Powered by Gemini 2.0 Flash',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade700,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Bottom Info
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(16),
+                          shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
-                            width: 1,
+                            color: Colors.white.withOpacity(0.1),
+                            width: 2,
                           ),
                         ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Menganalisis kondisi buah kakao',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
-                    ],
+                    );
+                  },
+                ),
+              );
+            }),
+
+            // Main content
+            SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Main card
+                        Container(
+                          padding: const EdgeInsets.all(40),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 30,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Lottie with pulse
+                              AnimatedBuilder(
+                                animation: _pulseAnimation,
+                                builder: (context, child) {
+                                  return Transform.scale(
+                                    scale: _pulseAnimation.value,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: RadialGradient(
+                                          colors: [
+                                            const Color(0xFF2D7A4F).withOpacity(0.15),
+                                            Colors.transparent,
+                                          ],
+                                        ),
+                                      ),
+                                      child: Lottie.asset(
+                                        'assets/animations/AI.json',
+                                        height: 160,
+                                        width: 160,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              const Text(
+                                'Gemini AI Menganalisis',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF2D7A4F),
+                                ),
+                              ),
+
+                              const SizedBox(height: 8),
+
+                              Text(
+                                'Mohon tunggu sebentar...',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey.shade600,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              // Animated progress bar
+                              SizedBox(
+                                width: 220,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: LinearProgressIndicator(
+                                    backgroundColor: Colors.grey.shade200,
+                                    valueColor: const AlwaysStoppedAnimation<Color>(
+                                      Color(0xFF2D7A4F),
+                                    ),
+                                    minHeight: 8,
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      const Color(0xFF2D7A4F).withOpacity(0.1),
+                                      const Color(0xFF3D9A63).withOpacity(0.1),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: const Color(0xFF2D7A4F).withOpacity(0.3),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.auto_awesome,
+                                      size: 18,
+                                      color: Color(0xFF2D7A4F),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Powered by Gemini 2.0 Flash',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade700,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // Bottom info
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 14,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                'Menganalisis kondisi buah kakao',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
-}
-
-// Custom Painter for Rotating Circles Background
-class CircleBackgroundPainter extends CustomPainter {
-  final double animation;
-
-  CircleBackgroundPainter({required this.animation});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-
-    final center = Offset(size.width / 2, size.height / 2);
-
-    // Draw multiple rotating circles
-    for (int i = 0; i < 5; i++) {
-      final radius = 100.0 + (i * 60);
-      final opacity = 0.15 - (i * 0.02);
-      
-      paint.color = Colors.white.withOpacity(opacity);
-      
-      canvas.save();
-      canvas.translate(center.dx, center.dy);
-      canvas.rotate(animation * 2 * math.pi * (i % 2 == 0 ? 1 : -1));
-      canvas.translate(-center.dx, -center.dy);
-      
-      canvas.drawCircle(center, radius, paint);
-      
-      canvas.restore();
-    }
-  }
-
-  @override
-  bool shouldRepaint(CircleBackgroundPainter oldDelegate) =>
-      animation != oldDelegate.animation;
-}
-
-// Custom Painter for Floating Particles
-class ParticlePainter extends CustomPainter {
-  final double animation;
-
-  ParticlePainter({required this.animation});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
-      ..style = PaintingStyle.fill;
-
-    final random = math.Random(42); // Fixed seed for consistency
-
-    for (int i = 0; i < 30; i++) {
-      final x = random.nextDouble() * size.width;
-      final baseY = random.nextDouble() * size.height;
-      final y = baseY + (animation * 100) % size.height;
-      final radius = 1.0 + random.nextDouble() * 3;
-
-      if (y < size.height + 50) {
-        paint.color = Colors.white.withOpacity(0.2 + random.nextDouble() * 0.3);
-        canvas.drawCircle(Offset(x, y % size.height), radius, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(ParticlePainter oldDelegate) =>
-      animation != oldDelegate.animation;
-}
-
-// Custom Painter for Grid Pattern
-class GridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-
-    const spacing = 40.0;
-
-    // Vertical lines
-    for (double x = 0; x < size.width; x += spacing) {
-      canvas.drawLine(
-        Offset(x, 0),
-        Offset(x, size.height),
-        paint,
-      );
-    }
-
-    // Horizontal lines
-    for (double y = 0; y < size.height; y += spacing) {
-      canvas.drawLine(
-        Offset(0, y),
-        Offset(size.width, y),
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
