@@ -1,6 +1,7 @@
 import 'package:cocoa_sense/screen/widget/card/feature_card.dart';
 import 'package:cocoa_sense/screen/widget/card/info_card.dart';
 import 'package:cocoa_sense/screen/widget/card/sensor_realtime_card.dart';
+import 'package:cocoa_sense/screen/widget/card/recent_detection_card.dart';
 import 'package:cocoa_sense/screen/widget/garden_status.dart';
 import 'package:flutter/material.dart';
 
@@ -140,6 +141,35 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.thermostat,
                   chartData: const [27.5, 27.8, 28.0, 28.2, 28.5, 28.3, 28.4, 28.6, 28.4],
                 ),
+                const SizedBox(height: 20),
+
+                // Recent Detection Section
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.history,
+                          size: 20,
+                          color: Color(0xFF2D7A4F),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'DETEKSI TERKINI',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                const RecentDetectionCard(),
                 const SizedBox(height: 20),
               ],
             ),

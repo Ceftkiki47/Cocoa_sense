@@ -9,7 +9,7 @@ class MapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(MapController());
+    final controller = Get.put(MapController(), tag: 'map');
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),

@@ -121,14 +121,8 @@ class PhotoResultScreen extends StatelessWidget {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // TODO: Implement AI analysis
-                          Get.snackbar(
-                            'Analisis AI',
-                            'Fitur analisis AI akan segera hadir',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: const Color(0xFF2D7A4F),
-                            colorText: Colors.white,
-                          );
+                          // Navigate to loading screen
+                          Get.toNamed('/ai-loading', arguments: imagePath);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF2D7A4F),

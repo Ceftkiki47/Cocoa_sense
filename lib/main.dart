@@ -1,4 +1,6 @@
 import 'package:cocoa_sense/routes/app_routes.dart';
+import 'package:cocoa_sense/controllers/detection_history_controller.dart';
+import 'package:cocoa_sense/controllers/main_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -8,6 +10,11 @@ void main() {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+  
+  // Initialize global controllers (permanent)
+  Get.put(DetectionHistoryController(), permanent: true);
+  Get.put(MainController(), permanent: true);
+  
   runApp(const MyApp());
 }
 

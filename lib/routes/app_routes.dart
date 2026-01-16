@@ -7,6 +7,10 @@ import 'package:cocoa_sense/screen/map_screen.dart';
 import 'package:cocoa_sense/screen/camera_scan_screen.dart';
 import 'package:cocoa_sense/screen/monitoring_screen.dart';
 import 'package:cocoa_sense/screen/photo_result_screen.dart';
+import 'package:cocoa_sense/screen/ai_detection_loading_screen.dart';
+import 'package:cocoa_sense/screen/ai_result_screen.dart';
+import 'package:cocoa_sense/screen/detection_history_screen.dart';
+import 'package:cocoa_sense/screen/detection_detail_screen.dart';
 
 class AppRoutes {
   static const splash = '/';
@@ -17,6 +21,10 @@ class AppRoutes {
   static const camera = '/camera';
   static const monitoring = '/monitoring';
   static const photoResult = '/photo-result';
+  static const aiLoading = '/ai-loading';
+  static const aiResult = '/ai-result';
+  static const history = '/history';
+  static const detectionDetail = '/detection-detail';
 }
 
 class AppPages {
@@ -52,6 +60,22 @@ class AppPages {
     GetPage(
       name: AppRoutes.photoResult,
       page: () => const PhotoResultScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.aiLoading,
+      page: () => const AIDetectionLoadingScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.aiResult,
+      page: () => const AIResultScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.history,
+      page: () => const DetectionHistoryScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.detectionDetail,
+      page: () => const DetectionDetailScreen(),
     ),
   ];
 }

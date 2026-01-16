@@ -8,7 +8,7 @@ class MonitoringScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(MonitoringController());
+    final controller = Get.put(MonitoringController(), tag: 'monitoring');
 
     return Scaffold(
       backgroundColor: Colors.grey[100],

@@ -1,6 +1,7 @@
 import 'package:cocoa_sense/screen/map_screen.dart';
 import 'package:cocoa_sense/screen/monitoring_screen.dart';
 import 'package:cocoa_sense/screen/profile_screen.dart';
+import 'package:cocoa_sense/screen/widget/history_floating_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cocoa_sense/controllers/main_controller.dart';
@@ -11,7 +12,7 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(MainController());
+    final controller = Get.find<MainController>();
     
     final List<Widget> screens = [
       const HomeScreen(),
@@ -22,7 +23,17 @@ class MainScreen extends StatelessWidget {
     ];
 
     return Obx(() => Scaffold(
-      body: screens[controller.selectedIndex.value],
+      body: Stack(
+        children: [
+          screens[controller.selectedIndex.value],
+          // History FAB positioned absolutely
+          Positioned(
+            bottom: 100,
+            right: 20,
+            child: const HistoryFloatingButton(),
+          ),
+        ],
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -65,6 +76,7 @@ class MainScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'camera_fab',
         onPressed: () => controller.onItemTapped(2),
         backgroundColor: const Color(0xFF2D7A4F),
         elevation: 4,

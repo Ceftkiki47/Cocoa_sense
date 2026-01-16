@@ -19,7 +19,11 @@ class _CameraScanScreenState extends State<CameraScanScreen>
   @override
   void initState() {
     super.initState();
-    controller = Get.put(cam_ctrl.CameraController());
+    // Use lazyPut with tag to avoid multiple instances
+    if (!Get.isRegistered<cam_ctrl.CameraController>(tag: 'camera')) {
+      Get.lazyPut(() => cam_ctrl.CameraController(), tag: 'camera');
+    }
+    controller = Get.find<cam_ctrl.CameraController>(tag: 'camera');
     
     _animationController = AnimationController(
       duration: const Duration(seconds: 2),
@@ -34,6 +38,10 @@ class _CameraScanScreenState extends State<CameraScanScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    // Clean up camera controller when screen is disposed
+    if (Get.isRegistered<cam_ctrl.CameraController>(tag: 'camera')) {
+      Get.delete<cam_ctrl.CameraController>(tag: 'camera');
+    }
     super.dispose();
   }
 
