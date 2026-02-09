@@ -113,7 +113,7 @@ class AIResultScreen extends StatelessWidget {
                   : Image.file(File(imagePath), fit: BoxFit.contain),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 9),
 
             // =======================
             // DETAIL & RECOMMENDATION
@@ -332,7 +332,7 @@ class AIResultScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           entry.value,

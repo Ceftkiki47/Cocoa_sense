@@ -54,7 +54,7 @@ dependencies:
   camera: ^0.10.5+5
   
   # Image Picker
-  image_picker: ^1.0.4
+  image_picker: ^1.2.1
   
   # HTTP Client for API calls
   dio: ^5.4.0

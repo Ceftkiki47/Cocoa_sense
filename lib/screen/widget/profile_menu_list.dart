@@ -1,7 +1,9 @@
 // lib/widgets/profile_menu_list.dart
 
+import 'package:cocoa_sense/screen/widget/dialogs/logout_dialog.dart';
 import 'package:flutter/material.dart';
 import 'profile_menu_item.dart';
+import 'package:get/get.dart';
 
 class ProfileMenuList extends StatelessWidget {
   const ProfileMenuList({Key? key}) : super(key: key);
@@ -26,26 +28,16 @@ class ProfileMenuList extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            Icon(
-              Icons.logout,
-              size: 48,
-              color: Colors.red[400],
-            ),
+            Icon(Icons.logout, size: 48, color: Colors.red[400]),
             const SizedBox(height: 16),
             const Text(
               'Keluar dari Akun?',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               'Anda akan keluar dari akun COCOA-SENSE',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -143,6 +135,17 @@ class ProfileMenuList extends StatelessWidget {
           ),
           const Divider(height: 1, indent: 68),
           ProfileMenuItem(
+            icon: Icons.history_outlined,
+            iconColor: Colors.grey[700]!,
+            iconBackgroundColor: Colors.grey[100]!,
+            title: 'Riwayat Deteksi',
+            onTap: () {
+              print('🕐 History button tapped!');
+              Get.toNamed('/history');
+            },
+          ),
+          const Divider(height: 1, indent: 68),
+          ProfileMenuItem(
             icon: Icons.settings_outlined,
             iconColor: Colors.grey[700]!,
             iconBackgroundColor: Colors.grey[100]!,
@@ -159,7 +162,10 @@ class ProfileMenuList extends StatelessWidget {
             title: 'Keluar Sesi',
             titleColor: Colors.red[600]!,
             showArrow: false,
-            onTap: () => _showLogoutDialog(context),
+            onTap: () {
+              debugPrint("📌 [ProfileMenu] Menu logout ditekan");
+              LogoutDialog.show(context);
+            },
           ),
         ],
       ),

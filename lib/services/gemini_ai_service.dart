@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiAIService {
-  static const String _apiKey = 'AIzaSyANwWMI8kashkndsA4pGz_5H1sCIlYyO0s';
+  static const String _apiKey = 'AIzaSyCiUR21lxaBfRltVfgJM-hLefUWuMs2NfQ';
 
   late final GenerativeModel _model;
 
